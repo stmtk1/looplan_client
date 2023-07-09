@@ -1,10 +1,10 @@
 'use client';
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from 'next/navigation';
 
 type InputElement = { target: { value: React.SetStateAction<string>; }; };
 
-export default function Page() {
+export default function SignUp() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -13,7 +13,8 @@ export default function Page() {
       user_name: userName,
       password,
     }
-    const ret = await (await fetch('http://localhost:3000/signup', {
+    console.log(body);
+    const ret = await (await fetch('http://localhost:3000/signin', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json'} },

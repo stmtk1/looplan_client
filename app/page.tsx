@@ -1,35 +1,37 @@
 'use client';
-import React, { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { Calendar } from "./components/calendar";
+import { getCalendarStart } from "./utils/dates";
+import { addMonths, getMonth, getYear, subMonths } from "date-fns";
 
-type InputElement = { target: { value: React.SetStateAction<string>; }; };
+export default function SignUp() {
+  const [start, setStart] = useState(getCalendarStart(new Date()));
+  const [showing, setShowing] = useState(new Date());
+  const month = useMemo(() => {
+    return getMonth(showing);
+  }, [ showing ]);
+  const headerStyle = {
+    display: 'grid',
+    'grid-template-columns': 'repeat(3, 1fr)',
+    height: '100px',
+  }
 
-export default function Page() {
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const onclick = useCallback(async () => {
-    const body = {
-      user_name: userName,
-      password,
-    }
-    const ret = await (await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json'} },
-      )).json();
-    console.log(ret);
-  }, [userName, password]);
+  const onClickPrevMonth = useCallback(() => {
+    setShowing(subMonths(showing, 1));
+    setStart(getCalendarStart(subMonths(showing, 1)));
+  }, [ showing, setShowing, setStart ]);
 
-  const changeUserName = useCallback((e: InputElement) => { setUserName(e.target.value)}, [ setUserName ]);
-  const changePassword = useCallback((e: InputElement) => { setPassword(e.target.value)}, [ setPassword ]);
+  const onClickNextMonth = useCallback(() => {
+    setShowing(addMonths(showing, 1));
+    setStart(getCalendarStart(addMonths(showing, 1)));
+  }, [ showing, setShowing, setStart ]);
+
   return <div>
-    <div>
-      <label>ユーザー名</label>
-      <input value={userName} type='input' onChange={changeUserName} />
+    <div style={headerStyle}>
+      <button onClick={onClickPrevMonth}>前の月</button>
+      <div>{getYear(showing)}年{month + 1}月</div>
+      <button onClick={onClickNextMonth}>次の月</button>
     </div>
-    <div>
-      <label>パスワード</label>
-      <input value={password} type='password' onChange={changePassword} />
-    </div>
-    <button onClick={onclick}>送信</button>
+    <Calendar start={start} showing={showing} />
   </div>;
 }
