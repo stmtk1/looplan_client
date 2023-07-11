@@ -1,10 +1,11 @@
 'use client';
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar } from "./components/calendar";
 import { getCalendarStart } from "./utils/dates";
 import { addMonths, getMonth, getYear, subMonths } from "date-fns";
+import { getSchedules } from "./utils/api";
 
-export default function SignUp() {
+export default async function SignUp() {
   const [start, setStart] = useState(getCalendarStart(new Date()));
   const [showing, setShowing] = useState(new Date());
   const month = useMemo(() => {
@@ -12,10 +13,12 @@ export default function SignUp() {
   }, [ showing ]);
   const headerStyle = {
     display: 'grid',
-    'grid-template-columns': 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     height: '100px',
   }
 
+
+  useEffect(() => { getSchedules(start).then(console.log) }, []);
   const onClickPrevMonth = useCallback(() => {
     setShowing(subMonths(showing, 1));
     setStart(getCalendarStart(subMonths(showing, 1)));

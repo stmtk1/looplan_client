@@ -18,7 +18,7 @@ export default function Page() {
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json'} },
       )).json();
-      document.cookie = `looplan'=${ret.token};max-age=${60 * 60 * 24 * 7}`;
+      document.cookie = `looplan=${ret.token};max-age=${60 * 60 * 24 * 7}`;
       router.push("/");
   }, [userName, password, router]);
 
