@@ -19,7 +19,7 @@ export default function ShowSchedule() {
   const router = useRouter();
 
   const start = useMemo(() => getCalendarStart(showing), [ showing ])
-   useEffect(() => { getSchedules(start).then((res) => setRowSchedules(res.schedules)) }, [ start ]);
+   useEffect(() => { getSchedules(showing).then((res) => setRowSchedules(res.schedules)) }, [ showing ]);
 
   const clickNewSchedule = useCallback(() => {
     router.push(`/schedule/new?date=${encodeURIComponent(formatISO(showing))}`);

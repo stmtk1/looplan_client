@@ -1,14 +1,15 @@
-import { endOfMonth, formatISO, set } from "date-fns";
+import { formatRFC3339, set } from "date-fns";
 import { CreateSchedule, RowSchedules } from "../types";
+import { getCalendarEnd, getCalendarStart } from "./dates";
 
 
-export async function getSchedules(start: Date): Promise<RowSchedules> {
+export async function getSchedules(date: Date): Promise<RowSchedules> {
     const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
     const token = `BEARER ${cookie_value}`;
-    const end = endOfMonth(start);
-    const encoded_start = encodeURIComponent(formatISO(start));
-    const encoded_end = encodeURIComponent(formatISO(end));
-    console.log(encoded_start);
+    const start = getCalendarStart(date);
+    const end = getCalendarEnd(date);
+    const encoded_start = encodeURIComponent(formatRFC3339(start));
+    const encoded_end = encodeURIComponent(formatRFC3339(end));
     const schedule = await (await fetch(
         `http://localhost:3000/schedule?start_time=${encoded_start}&end_time=${encoded_end}`, 
         { method: 'GET', headers: { AUTHORIZATION: token }})).json();
@@ -18,8 +19,8 @@ export async function getSchedules(start: Date): Promise<RowSchedules> {
 export async function createSchedule(dto: CreateSchedule): Promise<RowSchedules> {
     const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
     const token = `BEARER ${cookie_value}`;
-    const start = formatISO(setTime(dto.date, dto.start_time));
-    const end = formatISO(setTime(dto.date, dto.end_time));
+    const start = formatRFC3339(setTime(dto.date, dto.start_time));
+    const end = formatRFC3339(setTime(dto.date, dto.end_time));
     const body = {
         name: dto.name,
         description: dto.description,

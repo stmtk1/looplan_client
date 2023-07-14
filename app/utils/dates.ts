@@ -1,8 +1,12 @@
 'use client';
-import { startOfMonth, previousSunday } from 'date-fns';
+import { startOfMonth, previousSunday, endOfMonth, nextSaturday } from 'date-fns';
 
-export function getCalendarStart(arg: Date) {
+export function getCalendarStart(arg: Date): Date {
     return previousSunday(startOfMonth(arg));
+}
+
+export function getCalendarEnd(arg: Date): Date {
+    return nextSaturday(endOfMonth(arg));
 }
 
 export function formatUTC(input_date: Date) {
