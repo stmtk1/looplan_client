@@ -1,11 +1,12 @@
 'use client';
 
-import { addDays, getDate, getISODay, getMonth } from "date-fns";
+import { addDays, format, getDate, getISODay, getMonth } from "date-fns";
 import React, { useCallback } from "react";
+import { DistributedSchedule, Schedule } from "../types";
 
-type Prop = { start: Date, showing: Date, setShowing: (selected: Date) => void };
+type Prop = { start: Date, showing: Date, setShowing: (selected: Date) => void, schedules: DistributedSchedule };
 
-export function Calendar({ start, showing, setShowing }: Prop) {
+export function Calendar({ start, showing, setShowing, schedules }: Prop) {
     const style = {
         display: 'grid',
         gridTemplate: 'repeat(6, 1fr) / repeat(7, 1fr)',
@@ -18,19 +19,21 @@ export function Calendar({ start, showing, setShowing }: Prop) {
     return <div style={style}>
         {new Array(42).fill(null).map((_, i) => {
             const selected = addDays(start, i);
+            const key = format(selected, "yyyy-MM-dd");
             return <DateBox
                 key={i}
                 selected={selected}
                 thisMonth={getMonth(selected) == getMonth(showing)}
                 setShowing={setShowing}
+                schedules={schedules[key]}
             />
         })
         }
     </div>
 }
 
-type DateBoxProp = { selected: Date, thisMonth: boolean, setShowing: (date: Date) => void };
-function DateBox({ selected, thisMonth, setShowing }: DateBoxProp) {
+type DateBoxProp = { selected: Date, thisMonth: boolean, setShowing: (date: Date) => void, schedules: Schedule[] | undefined };
+function DateBox({ selected, thisMonth, setShowing, schedules }: DateBoxProp) {
     const color = getColor(selected, thisMonth);
     const style = {
         color,
@@ -38,10 +41,12 @@ function DateBox({ selected, thisMonth, setShowing }: DateBoxProp) {
     }
 
     const onClick = useCallback((e: React.MouseEvent) => { 
-        console.log(selected);
         setShowing(selected);
      }, [ selected, setShowing ]);
-    return <div style={style} onClick={onClick}>{getDate(selected)}</div>
+    return <div style={style}>
+        <div onClick={onClick}>{getDate(selected)}</div>
+        {schedules?.length && <div>{schedules!.length}件の予定</div> }
+    </div>
 }
 
 function getColor(showing: Date, thisMonth: boolean) {

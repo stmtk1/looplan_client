@@ -2,9 +2,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar } from "./components/calendar";
 import { getCalendarStart } from "./utils/dates";
-import { addMonths, format, formatISO, subMonths } from "date-fns";
+import { addMonths, format, formatISO, parseISO, subMonths } from "date-fns";
 import { getSchedules } from "./utils/api";
 import { useRouter } from "next/navigation";
+import { Schedule, RowSchedule, DistributedSchedule } from "./types";
 
 const headerStyle = {
   display: 'grid',
@@ -14,10 +15,11 @@ const headerStyle = {
 
 export default function ShowSchedule() {
   const [showing, setShowing] = useState(new Date());
+  const [rowSchedules, setRowSchedules] = useState<RowSchedule[]>([]);
   const router = useRouter();
 
   const start = useMemo(() => getCalendarStart(showing), [ showing ])
-   useEffect(() => { getSchedules(start).then(console.log) }, [ start ]);
+   useEffect(() => { getSchedules(start).then((res) => setRowSchedules(res.schedules)) }, [ start ]);
 
   const clickNewSchedule = useCallback(() => {
     router.push(`/schedule/new?date=${encodeURIComponent(formatISO(showing))}`);
@@ -31,6 +33,10 @@ export default function ShowSchedule() {
     setShowing(addMonths(showing, 1));
   }, [ showing, setShowing ]);
 
+  const schedules = useMemo(() => rowSchedules.map(toSchedule), [ rowSchedules ]);
+  const distributedSchedule = useMemo(() => distributeSchedule(schedules), [ schedules ]);
+  console.log(distributedSchedule);
+
   return <div>
     <div style={headerStyle}>
       <button onClick={onClickPrevMonth}>前の月</button>
@@ -40,6 +46,27 @@ export default function ShowSchedule() {
       </div>
       <button onClick={onClickNextMonth}>次の月</button>
     </div>
-    <Calendar start={start} showing={showing} setShowing={setShowing} />
+    <Calendar start={start} showing={showing} setShowing={setShowing} schedules={distributedSchedule} />
   </div>;
+}
+
+function distributeSchedule(schedules: Schedule[]): DistributedSchedule {
+  const ret: DistributedSchedule = {}
+  for (const schedule of schedules) {
+    const key = format(schedule.start_time, "yyyy-MM-dd");
+    if (ret[key] == undefined) {
+      ret[key] = [schedule]
+    } else {
+      ret[key].push(schedule);
+    }
+  }
+  return ret;
+}
+
+function toSchedule(row: RowSchedule): Schedule {
+  return {
+    ...row,
+    start_time: parseISO(row.start_time),
+    end_time: parseISO(row.end_time),
+  }
 }

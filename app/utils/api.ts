@@ -1,9 +1,8 @@
 import { endOfMonth, formatISO, set } from "date-fns";
-import { CreateSchedule } from "../types";
+import { CreateSchedule, RowSchedules } from "../types";
 
 
-type Schedules = { hello: string }
-export async function getSchedules(start: Date): Promise<Schedules> {
+export async function getSchedules(start: Date): Promise<RowSchedules> {
     const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
     const token = `BEARER ${cookie_value}`;
     const end = endOfMonth(start);
@@ -16,7 +15,7 @@ export async function getSchedules(start: Date): Promise<Schedules> {
     return schedule;
 }
 
-export async function createSchedule(dto: CreateSchedule): Promise<Schedules> {
+export async function createSchedule(dto: CreateSchedule): Promise<RowSchedules> {
     const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
     const token = `BEARER ${cookie_value}`;
     const start = formatISO(setTime(dto.date, dto.start_time));
