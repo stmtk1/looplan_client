@@ -1,34 +1,47 @@
 'use client';
 
 import { addDays, getDate, getISODay, getMonth } from "date-fns";
+import React, { useCallback } from "react";
 
-type Prop = { start: Date, showing: Date };
+type Prop = { start: Date, showing: Date, setShowing: (selected: Date) => void };
 
-export function Calendar({ start, showing }: Prop) {
+export function Calendar({ start, showing, setShowing }: Prop) {
     const style = {
         display: 'grid',
-        'grid-template': 'repeat(6, 1fr) / repeat(7, 1fr)',
-        'grid-auto-flow': 'row',
-        'height': '600px',
-        'width': '700px',
+        gridTemplate: 'repeat(6, 1fr) / repeat(7, 1fr)',
+        gridAutoFlow: 'row',
+        height: '600px',
+        width: '700px',
     };
+
+
     return <div style={style}>
         {new Array(42).fill(null).map((_, i) => {
             const selected = addDays(start, i);
-            return <DateBox key={i} selected={selected} thisMonth={getMonth(selected) == getMonth(showing)} />
+            return <DateBox
+                key={i}
+                selected={selected}
+                thisMonth={getMonth(selected) == getMonth(showing)}
+                setShowing={setShowing}
+            />
         })
         }
     </div>
 }
 
-type DateBoxProp = { selected: Date, thisMonth: boolean };
-function DateBox({ selected, thisMonth }: DateBoxProp) {
+type DateBoxProp = { selected: Date, thisMonth: boolean, setShowing: (date: Date) => void };
+function DateBox({ selected, thisMonth, setShowing }: DateBoxProp) {
     const color = getColor(selected, thisMonth);
     const style = {
         color,
         border: 'solid black 0.1px',
     }
-    return <div style={style}>{getDate(selected)}</div>
+
+    const onClick = useCallback((e: React.MouseEvent) => { 
+        console.log(selected);
+        setShowing(selected);
+     }, [ selected, setShowing ]);
+    return <div style={style} onClick={onClick}>{getDate(selected)}</div>
 }
 
 function getColor(showing: Date, thisMonth: boolean) {
