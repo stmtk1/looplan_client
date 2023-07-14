@@ -17,11 +17,11 @@ export default function ShowSchedule() {
   const router = useRouter();
 
   const start = useMemo(() => getCalendarStart(showing), [ showing ])
-   useEffect(() => { getSchedules(start).then(console.log) }, []);
+   useEffect(() => { getSchedules(start).then(console.log) }, [ start ]);
 
   const clickNewSchedule = useCallback(() => {
     router.push(`/schedule/new?date=${encodeURIComponent(formatISO(showing))}`);
-  }, [ router ]);
+  }, [ router, showing ]);
 
   const onClickPrevMonth = useCallback(() => {
     setShowing(subMonths(showing, 1));

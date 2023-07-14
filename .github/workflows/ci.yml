@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Run eslint
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        
+      - name: setup-node
+        uses: actions/setup-node@v3
+        with:
+            node-version: 18.15.0
+            cache: npm
+
+      - name: npm-install
+        run: npm install
+
+      - name: run-eslint
+        uses: npm lint
