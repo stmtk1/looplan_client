@@ -1,5 +1,5 @@
 "use client"
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { CreateSchedule } from "../../types";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,7 @@ export default function ScheduleCreator({ searchParams: { date: date_str }}: Pag
         () => createSchedule(schedule).then(() => router.push('/')), [schedule, router]
     );
     return <div>
+        <div>{format(schedule.date, "yyyy年MM月dd日")}のスケジュール</div>
         <div>
             <label>名前</label>
             <input type="input" value={schedule.name} onChange={changeScheduleName} />

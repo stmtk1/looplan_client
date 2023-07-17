@@ -6,11 +6,16 @@ import { addMonths, format, formatISO, parseISO, subMonths } from "date-fns";
 import { getSchedules } from "./utils/api";
 import { useRouter } from "next/navigation";
 import { Schedule, RowSchedule, DistributedSchedule } from "./types";
+import { ShowDateSchedules } from "./components/showDateSchedule";
 
 const headerStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   height: '100px',
+}
+
+const bodyStyle = {
+  display: 'flex',
 }
 
 export default function ShowSchedule() {
@@ -46,7 +51,10 @@ export default function ShowSchedule() {
       </div>
       <button onClick={onClickNextMonth}>次の月</button>
     </div>
-    <Calendar start={start} showing={showing} setShowing={setShowing} schedules={distributedSchedule} />
+    <div style={bodyStyle}>
+      <Calendar start={start} showing={showing} setShowing={setShowing} schedules={distributedSchedule} />
+      <ShowDateSchedules schedules={distributedSchedule[format(showing, "yyyy-MM-dd")]} />
+    </div>
   </div>;
 }
 

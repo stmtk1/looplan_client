@@ -40,11 +40,11 @@ function DateBox({ selected, thisMonth, setShowing, schedules }: DateBoxProp) {
         border: 'solid black 0.1px',
     }
 
-    const onClick = useCallback((e: React.MouseEvent) => { 
+    const onClick = useCallback(() => { 
         setShowing(selected);
      }, [ selected, setShowing ]);
-    return <div style={style}>
-        <div onClick={onClick}>{getDate(selected)}</div>
+    return <div style={style} onClick={onClick}>
+        <div>{getDate(selected)}</div>
         {schedules?.length && <div>{schedules!.length}件の予定</div> }
     </div>
 }
