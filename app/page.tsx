@@ -5,8 +5,9 @@ import { getCalendarStart } from "./utils/dates";
 import { addMonths, format, formatISO, parseISO, subMonths } from "date-fns";
 import { getSchedules } from "./utils/api";
 import { useRouter } from "next/navigation";
-import { Schedule, RowSchedule, DistributedSchedule } from "./types";
+import { RowSchedule } from "./types";
 import { ShowDateSchedules } from "./components/showDateSchedule";
+import { distributeSchedule, toSchedule } from "./utils/schedule";
 
 const headerStyle = {
   display: 'grid',
@@ -53,28 +54,8 @@ export default function ShowSchedule() {
     </div>
     <div style={bodyStyle}>
       <Calendar start={start} showing={showing} setShowing={setShowing} schedules={distributedSchedule} />
-      <ShowDateSchedules schedules={distributedSchedule[format(showing, "yyyy-MM-dd")]} />
+      <ShowDateSchedules schedules={distributedSchedule[format(showing, "yyyy-MM-dd")]} router={router} />
     </div>
   </div>;
 }
 
-function distributeSchedule(schedules: Schedule[]): DistributedSchedule {
-  const ret: DistributedSchedule = {}
-  for (const schedule of schedules) {
-    const key = format(schedule.start_time, "yyyy-MM-dd");
-    if (ret[key] == undefined) {
-      ret[key] = [schedule]
-    } else {
-      ret[key].push(schedule);
-    }
-  }
-  return ret;
-}
-
-function toSchedule(row: RowSchedule): Schedule {
-  return {
-    ...row,
-    start_time: parseISO(row.start_time),
-    end_time: parseISO(row.end_time),
-  }
-}

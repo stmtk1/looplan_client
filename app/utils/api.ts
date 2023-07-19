@@ -1,5 +1,5 @@
 import { formatRFC3339, set } from "date-fns";
-import { CreateSchedule, RowSchedules } from "../types";
+import { CreateSchedule, RowSchedules, RowSchedule, UpdateSchedule } from "../types";
 import { getCalendarEnd, getCalendarStart } from "./dates";
 
 
@@ -12,6 +12,29 @@ export async function getSchedules(date: Date): Promise<RowSchedules> {
     const encoded_end = encodeURIComponent(formatRFC3339(end));
     const schedule = await (await fetch(
         `http://localhost:3000/schedule?start_time=${encoded_start}&end_time=${encoded_end}`, 
+        { method: 'GET', headers: { AUTHORIZATION: token }})).json();
+    return schedule;
+}
+
+export async function updateSchedule(schedule: UpdateSchedule): Promise<RowSchedule> {
+    const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
+    const token = `BEARER ${cookie_value}`;
+    const body = {
+        name: schedule.name,
+        description: schedule.description,
+        start_time: setTime(schedule.date, schedule.start_time),
+        end_time: setTime(schedule.date, schedule.end_time),
+    }
+    return await (await fetch(
+        `http://localhost:3000/schedule/${schedule.id}`, 
+        { method: 'POST', headers: { AUTHORIZATION: token, 'Content-Type': 'application/json' }, body: JSON.stringify(body)})).json();
+}
+
+export async function getScheduleDetail(schedule_id: string): Promise<RowSchedule> {
+    const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
+    const token = `BEARER ${cookie_value}`;
+    const schedule = await (await fetch(
+        `http://localhost:3000/schedule/${schedule_id}`, 
         { method: 'GET', headers: { AUTHORIZATION: token }})).json();
     return schedule;
 }
