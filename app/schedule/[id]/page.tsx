@@ -1,19 +1,24 @@
 'use client';
 
 import { useCallback, useEffect, useState } from "react";
-import { getScheduleDetail, updateSchedule } from "../../utils/api"
-import { UpdateSchedule } from "../../types";
+import { getScheduleColors, getScheduleDetail, updateSchedule } from "../../utils/api"
+import { ScheduleColor, UpdateSchedule } from "../../types";
 import { toUpdateSchedule } from "../../utils/schedule";
 import { InputSchedule } from "../../components/inputSchedule";
+import { useRouter } from "next/navigation";
 
 type Prop = { params: { id: string }}
+const initState = { name: '', id: '', start_time: '00:00', end_time: '00:00', description: '', date: new Date(), color_id: '' };
 
 export default function ShowSchedule({ params: { id } }: Prop) {
-    const [schedule, setSchedule] = useState<UpdateSchedule>({ name: '', id: '', start_time: '00:00', end_time: '00:00', description: '', date: new Date() });
+    const [schedule, setSchedule] = useState<UpdateSchedule>(initState);
+    const [colors, setColors] = useState<ScheduleColor[]>([]);
+    const router = useRouter();
     useEffect(() => { getScheduleDetail(id).then((res) => setSchedule(toUpdateSchedule(res))) }, [ id, setSchedule ]);
-    const onUpdateSchedule = useCallback(() => { updateSchedule(schedule) }, [ schedule ]);
+    useEffect(() => { getScheduleColors().then((res) => setColors(res.schedule_colors)) }, [ id, setSchedule ]);
+    const onUpdateSchedule = useCallback(() => { updateSchedule(schedule).then(() => router.push('/')) }, [ schedule, router ]);
     return <div>
-        <InputSchedule schedule={ schedule } setSchedule={setSchedule} />
+        <InputSchedule schedule={ schedule } setSchedule={setSchedule} colors={colors} />
         <button onClick={onUpdateSchedule}>スケジュール更新</button>
     </div>
 }

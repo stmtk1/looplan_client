@@ -2,8 +2,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar } from "./components/calendar";
 import { getCalendarStart } from "./utils/dates";
-import { addMonths, format, formatISO, parseISO, subMonths } from "date-fns";
-import { getSchedules } from "./utils/api";
+import { addMonths, format, formatISO, subMonths } from "date-fns";
+import { getSchedules, getScheduleColors } from "./utils/api";
 import { useRouter } from "next/navigation";
 import { RowSchedule } from "./types";
 import { ShowDateSchedules } from "./components/showDateSchedule";
@@ -26,6 +26,7 @@ export default function ShowSchedule() {
 
   const start = useMemo(() => getCalendarStart(showing), [ showing ])
    useEffect(() => { getSchedules(showing).then((res) => setRowSchedules(res.schedules)) }, [ showing ]);
+   useEffect(() => { getScheduleColors().then(console.log) }, [ showing ]);
 
   const clickNewSchedule = useCallback(() => {
     router.push(`/schedule/new?date=${encodeURIComponent(formatISO(showing))}`);

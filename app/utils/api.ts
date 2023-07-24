@@ -1,6 +1,24 @@
 import { formatRFC3339, set } from "date-fns";
-import { CreateSchedule, RowSchedules, RowSchedule, UpdateSchedule } from "../types";
+import { CreateSchedule, RowSchedules, RowSchedule, UpdateSchedule, ScheduleColors, CreateScheduleColor } from "../types";
 import { getCalendarEnd, getCalendarStart } from "./dates";
+
+export async function getScheduleColors(): Promise<ScheduleColors> {
+    const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
+    const token = `BEARER ${cookie_value}`;
+    const schedule = await (await fetch(
+        `http://localhost:3000/schedule_color`, 
+        { method: 'GET', headers: { AUTHORIZATION: token }})).json();
+    return schedule;
+}
+
+export async function createScheduleColor(dto: CreateScheduleColor): Promise<void> {
+    const cookie_value = document.cookie.split("; ").find((e: string) => e.match(/looplan=/))?.split("=")[1];
+    const token = `BEARER ${cookie_value}`;
+    const schedule = await (await fetch(
+        `http://localhost:3000/schedule_color`, 
+        { method: 'POST', headers: { AUTHORIZATION: token, 'Content-Type': 'application/json' }, body: JSON.stringify(dto)})).json();
+    return schedule;
+}
 
 
 export async function getSchedules(date: Date): Promise<RowSchedules> {
@@ -24,10 +42,12 @@ export async function updateSchedule(schedule: UpdateSchedule): Promise<RowSched
         description: schedule.description,
         start_time: setTime(schedule.date, schedule.start_time),
         end_time: setTime(schedule.date, schedule.end_time),
+        color_id: schedule.color_id,
     }
-    return await (await fetch(
+    const a = await (await fetch(
         `http://localhost:3000/schedule/${schedule.id}`, 
         { method: 'POST', headers: { AUTHORIZATION: token, 'Content-Type': 'application/json' }, body: JSON.stringify(body)})).json();
+    return a
 }
 
 export async function getScheduleDetail(schedule_id: string): Promise<RowSchedule> {
@@ -49,6 +69,7 @@ export async function createSchedule(dto: CreateSchedule): Promise<RowSchedules>
         description: dto.description,
         start_time: start,
         end_time: end,
+        color_id: dto.color_id,
     }
     const schedule = await (await fetch(
         `http://localhost:3000/schedule`, 
