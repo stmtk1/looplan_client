@@ -37,6 +37,7 @@ export type RowSchedule = {
     description: string,
     start_time: string,
     end_time: string,
+    color_id: string,
 }
 
 export type Schedule = {
