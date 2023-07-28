@@ -1,13 +1,17 @@
 "use client"
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { CreateSchedule, ScheduleColor } from "../../types";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSchedule, getScheduleColors } from "../../utils/api";
 import { InputSchedule } from "../../components/inputSchedule";
-
+import { Header } from "../../components/header";
 
 type PageParams = { searchParams: { date: string } };
+
+const bodyStyle = {
+    paddingTop: '60px',
+};
 
 export default function ScheduleCreator({ searchParams: { date: date_str }}: PageParams) {
     const date = parseISO(date_str);
@@ -20,7 +24,10 @@ export default function ScheduleCreator({ searchParams: { date: date_str }}: Pag
         () => createSchedule(schedule).then(() => router.push('/')), [schedule, router]
     );
     return <div>
-        <InputSchedule schedule={schedule} setSchedule={setSchedule} colors={colors} />
-        <button onClick={onClickCreateSchedule}>スケジュール作成</button>
+        <Header router={router} />
+        <div style={bodyStyle}>
+            <InputSchedule schedule={schedule} setSchedule={setSchedule} colors={colors} />
+            <button onClick={onClickCreateSchedule}>スケジュール作成</button>
+        </div>
     </div>
 }

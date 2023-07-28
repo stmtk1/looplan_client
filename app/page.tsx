@@ -8,12 +8,14 @@ import { useRouter } from "next/navigation";
 import { RowSchedule } from "./types";
 import { ShowDateSchedules } from "./components/showDateSchedule";
 import { distributeSchedule, toSchedule } from "./utils/schedule";
+import { Header } from "./components/header";
 
 const headerStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   height: '100px',
-}
+  paddingTop: '60px',
+};
 
 const bodyStyle = {
   display: 'flex',
@@ -45,6 +47,7 @@ export default function ShowSchedule() {
   console.log(distributedSchedule);
 
   return <div>
+    <Header router={router} />
     <div style={headerStyle}>
       <button onClick={onClickPrevMonth}>前の月</button>
       <div onClick={clickNewSchedule}>
